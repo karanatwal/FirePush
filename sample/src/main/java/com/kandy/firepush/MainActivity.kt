@@ -2,21 +2,27 @@ package com.kandy.firepush
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.firepush.FirePush
+import com.firepush.Fire
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main)
 
 
-        FirePush.init("")
-
-        FirePush.create()
+        Fire.create()
             .setTitle("")
-            .setMessage("")
-            .setTitle("")
+            .setColor("")
+            .toIds("","")
+            .push()
+
+
+        Fire.createDataPayloadOnly()
+            .add("","")
+            .add("","")
+            .toTopic("")
+            .push()
 
     }
 }
