@@ -16,8 +16,13 @@ class MainActivity : AppCompatActivity() {
         api_key.setText(getString(R.string.auth_key))
         target.setText(getString(R.string.demoTokenId))
 
-        Fire.init(api_key.text.toString())
+
         btn.setOnClickListener {
+
+            //No need to init every time.
+            // Just use this function in BaseActivity or in Application class onCreate
+            Fire.init(api_key.text.toString())
+
             val selectedTarget = findViewById<RadioButton>(radioGroup.checkedRadioButtonId).text
             when {
                 selectedTarget.contains("Token") -> sendToToken()
