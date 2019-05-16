@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">FirePush</string>
+    <string name="a_lightweight_kotlin_android_library_to_send_fcm_push_notifications_like_a_pro">A lightweight
+        Kotlin/Android library to send FCM push notifications like a Pro.
+    </string>
+
+    <string name="auth_key">AAAAmN2v_Ig:APA91bH3Ckb4WHFqfS21RASHppSfu57SxkiN-bH4uFFvULrXv-9t9rmT4ncgEgG9FSnrhofYsXFjxN7d57HASAOmz4kNTp8tgDDW4XpzZNK16L3r4vRSzrVZsaVc5pXdzqHDb-wlBa2X</string>
+
+    <string name="demoTokenId">eyCzqGfG4LE:APA91bEkm-fl1VtIONCz5sSb2vniNox1qgDA2pRis8vnd0YLtPViXQbAV2QzxWZfchARl4BX6_IZ40LTLuxI0WqoECH2d_LzRX9zaMnm-3wXHMuhFtp8HH0Mugj9lR98dTUfOSbiRyME</string>
+
 </resources>

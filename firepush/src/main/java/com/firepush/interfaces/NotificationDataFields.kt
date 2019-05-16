@@ -1,7 +1,9 @@
-package com.firepush
+package com.firepush.interfaces
+
+import com.firepush.model.FirePushPriority
+import com.firepush.model.PushCallback
 
 interface NotificationDataFields {
-    //Notification fields
     fun setTitle(title: String): NotificationDataFields
     fun setBody(body: String): NotificationDataFields
     fun setSound(sound: String): NotificationDataFields
@@ -21,5 +23,5 @@ interface NotificationDataFields {
 
     fun setPriority(firePushPriority: FirePushPriority): NotificationDataFields
 
-    fun setCallback(callback: (String)-> Unit): NotificationDataFields
+    fun setCallback(callback: (PushCallback, Exception?) -> Unit): NotificationDataFields
 }

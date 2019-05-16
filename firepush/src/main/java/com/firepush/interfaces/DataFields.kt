@@ -1,8 +1,11 @@
-package com.firepush
+package com.firepush.interfaces
+
+import com.firepush.model.FirePushPriority
+import com.firepush.model.PushCallback
 
 interface DataFields {
     fun setPriority(firePushPriority: FirePushPriority): DataFields
-    fun setCallback(callback: (String)-> Unit): DataFields
+    fun setCallback(callback: (PushCallback, Exception?)-> Unit): DataFields
 
     fun add(key: String, value: String): DataFields
     fun add(hashMap: HashMap<String, String>): DataFields

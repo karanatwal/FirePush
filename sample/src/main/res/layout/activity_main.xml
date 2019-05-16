@@ -1,29 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        tools:context=".MainActivity"
         android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        android:layout_width="match_parent">
 
-    <TextView
-            android:id="@+id/text_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hello World!"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn"
-            android:text="Press"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/api_key"
+                android:hint="API Key (Required) e.g. AAAAmN2v_Ig:APA91bH3Ckb4WHFqfS21RASHppSfu57SxkiN-bH4uFFvULrXv..................."
+                android:fontFamily="sans-serif-condensed-light"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/titleTv"
+                android:hint="Title"
+                android:fontFamily="sans-serif-condensed-light"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/body"
+                android:hint="Body"
+                android:fontFamily="sans-serif-condensed-light"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:padding="5dp"
+                android:text="Choose a Target from below"
+                android:fontFamily="sans-serif-condensed-light"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+        <RadioGroup
+                android:checkedButton="@id/tokenRg"
+                android:id="@+id/radioGroup"
+                android:orientation="horizontal"
+                android:layout_width="match_parent" android:layout_height="wrap_content">
+
+            <RadioButton
+                    android:id="@+id/tokenRg"
+                    android:text="Token Id  "
+                    android:fontFamily="sans-serif-condensed-light"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+            <RadioButton
+                    android:text="Topic  "
+                    android:fontFamily="sans-serif-condensed-light"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+            <RadioButton
+                    android:text="Condition"
+                    android:fontFamily="sans-serif-condensed-light"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+        </RadioGroup>
+
+        <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/target"
+                android:hint="Target"
+                android:fontFamily="sans-serif-condensed-light"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+
+        <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn"
+                android:text="Push"
+                android:backgroundTint="@color/colorPrimary"
+                android:textColor="@android:color/white"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/response_tv"
+                android:layout_marginTop="10dp"
+                android:padding="20dp"
+                android:layout_gravity="center"
+                android:text="You will get Response of your push here."
+                android:fontFamily="sans-serif-condensed-light"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</ScrollView>

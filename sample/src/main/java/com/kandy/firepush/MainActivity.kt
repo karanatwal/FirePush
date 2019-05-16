@@ -1,11 +1,10 @@
 package com.kandy.firepush
 
-import android.app.ProgressDialog
 import android.os.Bundle
-import android.os.Handler
-import com.kandy.firepush.R
+import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
 import com.firepush.Fire
+import com.firepush.model.PushCallback
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -14,29 +13,64 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Fire.init("AAAAmN2v_Ig:APA91bH3Ckb4WHFqfS21RASHppSfu57SxkiN-bH4uFFvULrXv-9t9rmT4ncgEgG9FSnrhofYsXFjxN7d57HASAOmz4kNTp8tgDDW4XpzZNK16L3r4vRSzrVZsaVc5pXdzqHDb-wlBa2X")
+        api_key.setText(getString(R.string.auth_key))
+        target.setText(getString(R.string.demoTokenId))
 
+        Fire.init(api_key.text.toString())
         btn.setOnClickListener {
-            Fire.create()
-                .setTitle("My FirePush Title")
-                .setBody("My FirePush Title Body")
-                .addData("title","Amrinder demo")
-                .setCallback {
-                    text_tv.text = it
-                }
-                .toIds("eyCzqGfG4LE:APA91bEkm-fl1VtIONCz5sSb2vniNox1qgDA2pRis8vnd0YLtPViXQbAV2QzxWZfchARl4BX6_IZ40LTLuxI0WqoECH2d_LzRX9zaMnm-3wXHMuhFtp8HH0Mugj9lR98dTUfOSbiRyME")
-                .push()
+            val selectedTarget = findViewById<RadioButton>(radioGroup.checkedRadioButtonId).text
+            when {
+                selectedTarget.contains("Token") -> sendToToken()
+                selectedTarget.contains("Topic") -> sendToTopic()
+                selectedTarget.contains("Condition") -> sendToCondition()
+            }
         }
+    }
 
+    private fun sendToToken() {
+        Fire.create()
+            .setTitle(titleTv.text.toString())
+            .setBody(body.text.toString())
+            .setCallback { pushCallback, e ->
+                if (e == null) {
+                    response_tv.text = createResponseText(pushCallback)
+                } else response_tv.text = e.message
+            }
+            .toIds(target.text.toString())
+            .push()
+    }
 
+    private fun sendToTopic() {
+        Fire.create()
+            .setTitle(titleTv.text.toString())
+            .setBody(body.text.toString())
+            .setCallback { pushCallback, e ->
+                if (e == null) {
+                    response_tv.text = createResponseText(pushCallback)
+                } else response_tv.text = e.message
+            }
+            .toTopic(target.text.toString())
+            .push()
+    }
 
+    private fun sendToCondition() {
+        Fire.create()
+            .setTitle(titleTv.text.toString())
+            .setBody(body.text.toString())
+            .setCallback { pushCallback, e ->
+                if (e == null) {
+                    response_tv.text = createResponseText(pushCallback)
+                } else response_tv.text = e.message
+            }
+            .toCondition(target.text.toString())
+            .push()
+    }
 
-
-//        Fire.createDataPayloadOnly()
-//            .add("","")
-//            .add("","")
-//            .toTopic("")
-//            .push()
-
+    private fun createResponseText(pushCallback: PushCallback): String {
+        var text = "Response:\n\n"
+        if (pushCallback.isSent) {
+            text = text.plus("Message Sent Successfully").plus("\n\n").plus(pushCallback.jsonObject.toString())
+        } else text = text.plus("Fails to send message").plus("\n\n").plus(pushCallback.jsonObject.toString())
+        return text
     }
 }

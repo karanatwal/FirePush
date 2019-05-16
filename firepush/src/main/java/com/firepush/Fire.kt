@@ -1,11 +1,21 @@
 package com.firepush
 
-import com.firepush.Constants.AUTHORIZATION
-import com.firepush.Constants.CONTENT_TYPE
-import com.firepush.Constants.FCM_URL
-import com.firepush.Constants.JSON
-import com.firepush.Constants.KEY_PREFIX
-import com.firepush.Constants.POST
+import com.firepush.utils.Constants.AUTHORIZATION
+import com.firepush.utils.Constants.CONDITION
+import com.firepush.utils.Constants.CONTENT_TYPE
+import com.firepush.utils.Constants.FCM_URL
+import com.firepush.utils.Constants.ID
+import com.firepush.utils.Constants.JSON
+import com.firepush.utils.Constants.KEY_PREFIX
+import com.firepush.utils.Constants.POST
+import com.firepush.utils.Constants.TOPIC
+import com.firepush.builders.DataPayloadBuilder
+import com.firepush.builders.PayloadBuilder
+import com.firepush.interfaces.DataFields
+import com.firepush.interfaces.NotificationDataFields
+import com.firepush.interfaces.Push
+import com.firepush.model.FirePushPriority
+import com.firepush.model.PushCallback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,11 +27,11 @@ import java.net.URL
 import java.util.*
 
 /**
- * Created by Karandeep Atwal on 16/04/19.
+ * Created by https://karanatwal.github.io on 16/04/19.
  */
 object Fire : Push {
 
-    private var AUTH_KEY: String? = null
+    internal var AUTH_KEY: String? = null
 
     fun init(authKey: String) {
         AUTH_KEY = authKey
@@ -33,14 +43,14 @@ object Fire : Push {
 
     fun createDataPayloadOnly(): DataFields = DataPayloadBuilder()
 
-    private fun sendTo(
+    internal fun sendTo(
         topic: String? = null,
         ids: JSONArray? = null,
         condition: String? = null,
         notificationObject: JSONObject? = null,
         dataObject: JSONObject? = null,
         priority: FirePushPriority,
-        callback: ((String) -> Unit)? = null
+        callback: ((PushCallback, Exception?) -> Unit)? = null
     ) = CoroutineScope(Dispatchers.IO).launch {
 
         val payloadObject = JSONObject()
@@ -52,11 +62,11 @@ object Fire : Push {
         if (dataObject != null)
             payloadObject.put("data", dataObject)
         if (topic != null)
-            payloadObject.put("to", topic)
+            payloadObject.put(TOPIC, topic)
         if (ids != null)
-            payloadObject.put("registration_ids", ids)
+            payloadObject.put(ID, ids)
         if (condition != null)
-            payloadObject.put("condition", condition)
+            payloadObject.put(CONDITION, condition)
 
         val url = URL(FCM_URL)
         val connection = url.openConnection() as HttpURLConnection
@@ -68,164 +78,24 @@ object Fire : Push {
             val outputStream = connection.outputStream
             outputStream.write(payloadObject.toString().toByteArray())
 
-            val inputStream = connection.inputStream
+            val responseOK = connection.responseCode == HttpURLConnection.HTTP_OK
+            val inputStream = if (responseOK) connection.inputStream else connection.errorStream
 
             val scanner = Scanner(inputStream).useDelimiter("\\A")
             val response = if (scanner.hasNext()) scanner.next().replace(",", ",\n") else ""
 
-            withContext(Dispatchers.Main) {
-                callback?.invoke(response)
-            }
+            if (responseOK) {
+                val jsonObject = JSONObject(response)
+                val isSuccess = if (jsonObject.has("success")) jsonObject.getInt("success") == 1 else false
+                withContext(Dispatchers.Main) {
+                    callback?.invoke(PushCallback(isSuccess, JSONObject(response)), null)
+                }
+            } else throw Exception("Response Code: ".plus(connection.responseCode).plus(" Error: ".plus(response)))
+
         } catch (e: Exception) {
-            e.printStackTrace()
             withContext(Dispatchers.Main) {
-                callback?.invoke(e.message ?: "Exception occurs")
+                callback?.invoke(PushCallback(false, null), e)
             }
-        }
-    }
-
-
-    private class PayloadBuilder : NotificationDataFields, Target {
-
-        private val notificationObject by lazy { JSONObject() }
-
-        private var title: String? = null
-        private var body: String? = null
-        private var sound: String? = null
-        private var badge: String? = null
-        private var clickAction: String? = null
-        private var icon: String? = null
-        private var androidChannelId: String? = null
-        private var tag: String? = null
-        private var color: String? = null
-
-        private val dataObject by lazy { JSONObject() }
-
-        private var topic: String? = null
-        private var condition: String? = null
-        private var ids: JSONArray? = null
-
-        private var firePushPriority: FirePushPriority = FirePushPriority.NORMAL
-        private var callback: ((String) -> Unit)? = null
-
-
-        override fun setTitle(title: String): NotificationDataFields = apply { this.title = title }
-        override fun setBody(body: String): NotificationDataFields = apply { this.body = body }
-        override fun setSound(sound: String): NotificationDataFields = apply { this.sound = sound }
-        override fun setBadgeCount(badgeCount: Int): NotificationDataFields =
-            apply { this.badge = badgeCount.toString() }
-
-        override fun setClickAction(click_action: String): NotificationDataFields =
-            apply { this.clickAction = click_action }
-
-        override fun setIcon(icon: String): NotificationDataFields = apply { this.icon = icon }
-        override fun setAndroidChannelId(android_channel_id: String): NotificationDataFields =
-            apply { this.androidChannelId = android_channel_id }
-
-        override fun setTag(tag: String): NotificationDataFields = apply { this.tag = tag }
-        override fun setColor(color: String): NotificationDataFields = apply { this.color = color }
-
-        override fun addData(key: String, value: String) = apply { dataObject.put(key, value) }
-
-        override fun addData(hashMap: HashMap<String, String>) = apply {
-            hashMap.forEach {
-                dataObject.put(it.key, it.value)
-            }
-        }
-
-        override fun toTopic(topic: String) = apply { this.topic = topic }
-
-        override fun toIds(vararg ids: String) = apply { this.ids = JSONArray(ids) }
-
-        override fun toCondition(condition: String) = apply { this.condition = condition }
-
-
-        override fun setPriority(firePushPriority: FirePushPriority) =
-            apply { this.firePushPriority = firePushPriority }
-
-        override fun setCallback(callback: (String) -> Unit) = apply { this.callback = callback }
-
-
-        override fun push() = Fire.apply {
-
-            AUTH_KEY ?: error("Auth key not specified. Please use init function first.")
-            title ?: error("Title must be there")
-            body ?: error("Body must be there")
-
-            notificationObject.apply {
-                put("title", title)
-                put("body", body)
-
-                if (sound != null)
-                    put("sound", sound)
-                if (badge != null)
-                    put("badge", badge)
-                if (clickAction != null)
-                    put("click_action", clickAction)
-                if (icon != null)
-                    put("icon", icon)
-                if (androidChannelId != null)
-                    put("android_channel_id", androidChannelId)
-                if (tag != null)
-                    put("tag", tag)
-                if (color != null)
-                    put("color", color)
-            }
-
-            sendTo(
-                topic = topic,
-                ids = ids,
-                condition = condition,
-                notificationObject = notificationObject,
-                dataObject = if (dataObject.length() > 0) dataObject else null,
-                priority = firePushPriority,
-                callback = callback
-            )
-        }
-    }
-
-
-    private class DataPayloadBuilder : DataFields, Target {
-
-        private val dataObject by lazy { JSONObject() }
-
-        private var firePushPriority: FirePushPriority = FirePushPriority.NORMAL
-        private var callback: ((String) -> Unit)? = null
-
-        private var topic: String? = null
-        private var condition: String? = null
-        private var ids: JSONArray? = null
-
-        override fun setPriority(firePushPriority: FirePushPriority) =
-            apply { this.firePushPriority = firePushPriority }
-
-        override fun setCallback(callback: (String) -> Unit) = apply { this.callback = callback }
-
-        override fun add(key: String, value: String) = apply { dataObject.put(key, value) }
-
-        override fun add(hashMap: HashMap<String, String>) = apply {
-            hashMap.forEach {
-                dataObject.put(it.key, it.value)
-            }
-        }
-
-        override fun toTopic(topic: String) = apply { this.topic = topic }
-
-        override fun toIds(vararg ids: String) = apply { this.ids = JSONArray(ids) }
-
-        override fun toCondition(condition: String) = apply { this.condition = condition }
-
-        override fun push() = Fire.apply {
-            AUTH_KEY ?: error("Auth key not specified. Please use init function first.")
-
-            sendTo(
-                topic = topic,
-                ids = ids,
-                condition = condition,
-                dataObject = dataObject,
-                priority = firePushPriority,
-                callback = callback
-            )
         }
     }
 

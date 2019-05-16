@@ -1,7 +1,7 @@
-package com.firepush
+package com.firepush.utils
 
 /**
- * Created by Karandeep Atwal on 2019-05-14.
+ * Created by https://karanatwal.github.io on 2019-05-14.
  */
 internal object Constants {
     const val FCM_URL = "https://fcm.googleapis.com/fcm/send"
