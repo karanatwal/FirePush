@@ -18,7 +18,6 @@ class MainActivity : AppCompatActivity() {
 
 
         btn.setOnClickListener {
-
             //No need to init every time.
             // Just use this function in BaseActivity or in Application class onCreate
             Fire.init(api_key.text.toString())
