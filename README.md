@@ -1,5 +1,6 @@
 # FirePush - A Lightweight Kotlin Library for sending FCM push notification
 [![](https://jitpack.io/v/karanatwal/FirePush.svg)](https://jitpack.io/#karanatwal/FirePush)   ![](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)
+[![Android Arsenal]( https://img.shields.io/badge/Android%20Arsenal-FirePush-green.svg?style=flat )]( https://android-arsenal.com/details/1/7713 )
 
 Hi, I made this Library for a Chat based project I was working on. So I decided to make it publicly available. It is light weight Library. I have used [Java's HttpURLConnection](https://developer.android.com/reference/kotlin/java/net/HttpURLConnection) for network requests along with [Kotlin Coroutines](https://kotlinlang.org/docs/reference/coroutines-overview.html).
 
